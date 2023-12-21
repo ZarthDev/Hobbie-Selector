@@ -1,0 +1,237 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Hobbie Selector</title>
+
+    <link rel="shortcut icon" href="img/favicon_io/favicon-32x32.png" type="image/x-icon">
+
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Bad+Script&display=swap');
+
+        * { margin: 0; padding: 0; }
+        html { height: 100%; }
+
+        body {
+            background: url(img/bg.png);
+            background-size: 100%;
+            background-repeat: repeat-y;
+        }
+
+        /*header*/
+        header {
+            background: linear-gradient(to bottom, #200080, #620080);
+            height: 120px;
+            border: 2px solid #ffffff67;
+        }
+
+        header a {
+            font-family: 'Bad Script', cursive;
+            text-decoration: none;
+            color: #fff;
+            font-size: 60px;
+            line-height: 120px;
+            padding-left: 20px;
+        }
+
+        #info-area, #cards-area {
+            background-color: #ffffff3a;
+            border-radius: 20px;
+            width: 600px;
+            height: 500px;
+            float: left;
+            margin: 30px;
+            margin-left: 50px;
+            padding: 10px;
+            font-family: Arial, Helvetica, sans-serif;
+            font-size: 17px;
+            color: #fff;
+        }
+
+        #info-area input {
+            width: 80%;
+            height: 30px;
+            border-radius: 5px;
+            border: 1px solid grey;
+        }
+
+        #info-area select {
+            height: 30px;
+            border-radius: 5px;
+            border: 1px solid grey;
+        }
+
+        #info-area button {
+            height: 30px;
+            background-color: #780909;
+            border-radius: 5px;
+            border: 1px solid #850707;
+            padding: 5px;
+            margin-top: 5px;
+            color: #fff;
+        }
+        
+        #info-area button:hover {
+            background-color: #b70e0e47;
+        }
+        
+        .card {
+            font-size: 16px;
+            width: 28%;
+            border: 1px solid gray;
+            height: 60px;
+            border-radius: 10px;
+            line-height: 30px;
+            padding: 5px;
+            background: #ffffff5f;
+            float: left;
+            margin: 5px;
+        }
+
+        #people {
+            border-radius: 10px;
+            background: #ffffff49;
+            text-align: center;
+            padding: 20px;
+            margin-top: 15px;
+            filter: drop-shadow(5px 5px 10px #0000009d);
+        }
+
+        #people img {
+            width: 300px;
+            filter: drop-shadow(5px 5px 10px #0000009d);
+        }
+
+        .alert {
+            background: #7359c1;
+            height: 40px;
+            font-size: 25px;
+            color: #fff;
+            line-height: 40px;
+            text-indent: 20px;
+            font-family: Arial, Helvetica, sans-serif;
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <a href="#">Hobbie Selector</a>
+    </header>
+    
+    <div id="alert-area">
+    </div>
+
+    <main>
+        <div id="info-area">
+            <input
+                id="name"
+                type="text"
+                placeholder="nome"
+            >
+            <select id="hobbie">
+                <option value="Hobbie">Hobbie</option>
+                <option value="Andar de skate">Andar de skate</option>
+                <option value="Jogar Futebol">Jogar Futebol</option>
+                <option value="Estudar">Estudar</option>
+                <option value="Desenhar">Desenhar</option>
+                <option value="Ir a academia">Ir a academia</option>
+            </select>
+            
+            <button onclick="GetDados()">Enviar</button>
+            <button onclick="ClearDados()">Limpar Dados</button>
+            <button onclick="ShowPeoples()">Mostrar Pessoas</button>
+
+            <div id="people">
+                <img src="img/people.png">
+                <h1 id="LastPeople">Cadastre-se!</h1>
+                <span>última pessoa cadastrada!</span>
+            </div>
+        </div>
+        <div id="cards-area">
+        </div>
+    </main>
+
+    <script>
+        let nameInput;
+        let hobbieInput;
+        let LastPeople;
+        let Pessoa;
+        
+        class ControllInfo {
+            constructor ( ) {
+                let id = localStorage.getItem('id');
+                if (id === null) {
+                    localStorage.setItem('id', 0);
+                }
+            }
+
+            NextId ( ) {
+                let nextId = localStorage.getItem('id');
+                return parseInt(nextId) + 1; 
+            }
+
+            SavePessoa ( people ) {
+                let id = this.NextId();
+                localStorage.setItem(id, JSON.stringify(people));
+                localStorage.setItem('id', id);
+            }
+        }
+
+        let controller = new ControllInfo();
+
+        function GetDados ( ) {
+            nameInput = document.getElementById('name');
+            hobbieInput = document.getElementById('hobbie');
+        
+            Pessoa = {
+                name: nameInput.value,
+                hobbie: hobbieInput.value
+            }
+
+            LastPeople = Pessoa.name;
+            document.getElementById('LastPeople').innerHTML = LastPeople;
+
+            let message = document.createElement('div');
+            document.getElementById('alert-area').appendChild(message);
+            message.className = 'alert';
+            message.innerHTML = 'Nova Pessoa Cadastrada!';
+            
+            setInterval(function () {
+                document.getElementById('alert-area').removeChild(message);
+            }, 5000);
+
+            controller.SavePessoa(Pessoa);
+        }
+
+        function ShowPeoples ( ) {
+            let textArea = document.getElementById('textArea');
+            
+            let key = [];
+            for (let c = 1 ; c <= localStorage.length ; c++) {
+                key[c] = JSON.parse(localStorage.getItem(c));
+                let card = [];
+                if (key[c] != null) {
+                    card[c] = document.createElement('div');
+                    card[c].innerHTML = `Nome: ${key[c].name} <br>
+                    Hobbie: ${key[c].hobbie}`;
+                    card[c].className = 'card';
+                    document.getElementById('cards-area').appendChild(card[c]);
+                }
+            }
+        }
+
+        function ClearDados ( ) {
+            let card = document.getElementsByClassName('card');
+            
+            for (let i = card.length ; i != -1 ; i--) {
+                if (card[i] != undefined) 
+                    card[i].remove();
+            }
+            
+            localStorage.clear();
+            localStorage.setItem('id', 0);
+        }
+    </script>
+</body>
+</html>
